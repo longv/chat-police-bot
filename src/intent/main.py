@@ -1,4 +1,3 @@
-
 import os
 import pathlib
 from sys import exit
@@ -31,10 +30,11 @@ def main():
         text = ""
 
     cf = ContextFilter()
+    print(f"Context level 1 flow")
     check_text = cf.get_context_level1(text)
 
+    print(f"Context level 3 flow")
     check_text = cf.get_context_level3(text)
-    print(f"Text check: {check_text}")
 
     if args.output_file:
         with open(args.output_file, "w") as f:

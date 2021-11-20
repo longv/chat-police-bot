@@ -11,15 +11,15 @@ import logging
 path_base_data = pathlib.Path.cwd() / "context_filter" / "data"
 path_stoptalk_words = path_base_data / "en_stoptalk_words.txt"
 path_performance_words = path_base_data / "en_performance_words.txt"
-path_stoptalk_fixphrases = path_base_data / "en_stoptalk_fixphrases"
+path_stoptalk_fixphrases = path_base_data / "en_stoptalk_fixphrases.txt"
 
 
 class ContextFilter:
     def __init__(
-            self,
-            analysis_type="",
-            nlp=None,
-            language="en",
+        self,
+        analysis_type="",
+        nlp=None,
+        language="en",
     ):
         self.language = language
         self.analysis_type = analysis_type
@@ -33,16 +33,16 @@ class ContextFilter:
         is_from_wordsfile = None
         with open(filename) as f:
             single_words = [line.rstrip() for line in f]
-            logging.info(f"Filename words: {single_words}")
             is_from_wordsfile = any(word in text_words for word in single_words)
         return is_from_wordsfile
 
     def get_intent_response(self, reason):
-        response = ''
+        response = ""
         if reason == "stop_talking":
             with open(path_stoptalk_fixphrases) as f:
                 single_words = [line.rstrip() for line in f]
                 response = random.choice(single_words)
+
         return response
 
     def get_context_level1(self, text):
@@ -53,15 +53,16 @@ class ContextFilter:
         intent["reason"] = "good"
         split_words = text.split()
 
-        is_stoptalk = self.check_existance_from_wordsfile(filename=path_stoptalk_words,
-                                                          text_words=split_words)
-        is_performance = self.check_existance_from_wordsfile(filename=path_performance_words,
-                                                             text_words=split_words)
+        is_stoptalk = self.check_existance_from_wordsfile(filename=path_stoptalk_words, text_words=split_words)
+        is_performance = self.check_existance_from_wordsfile(filename=path_performance_words, text_words=split_words)
         if is_stoptalk:
             intent["reason"] = "stop_talking"
         if is_performance:
             intent["reason"] = "bad_performance"
-        self.get_intent_response(reason=intent["reason"])
+        response = self.get_intent_response(reason=intent["reason"])
+        print(
+            f"Suggested response for user: {response} instead of original: {text} which might get you muted or banned"
+        )
 
     def get_context_level2(self, text):
         pass
