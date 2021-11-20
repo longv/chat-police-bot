@@ -6,7 +6,7 @@ const client = new Client({ intents: [
 ]})
 
 let messageCollection = []
-let i=0
+let badWord = ['fuck', 'gay']
 let badFilter=[]
 
 client.on("ready", () => {
@@ -26,24 +26,19 @@ client.on("messageCreate", msg => {
     ],
     toxicity: false     
   }
-    
-  console.log(JSON.stringify(messageObject))
+  if (messageObject.score.includes(1)){
+    messageObject.toxicity = true
+    msg.reply("you're having bad behavior")
+  }
 
   messageCollection = messageCollection
     .concat(messageObject)
-    .map(message => {
-      if (message.score.includes(1)) {
-        return { ...message, toxicity: true }
-      } else {
-        return message
-      }
-    })
+    
   badFilter = messageCollection.filter(message => message.toxicity == true)
   console.log(JSON.stringify(badFilter))
   console.log(badFilter.length)
 
 
-  console.log(JSON.stringify(messageCollection))
 
   messageCollection.forEach(message => {
     console.log(message.body, message.id, message.score, message.toxicity)
