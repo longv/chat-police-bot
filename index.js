@@ -1,4 +1,5 @@
 const { Client, Intents } = require('discord.js')
+const { MessageActionRow, MessageSelectMenu, MessageButton, MessageEmbed } = require('discord.js')
 const client = new Client({ intents: [
   Intents.FLAGS.GUILDS, 
   Intents.FLAGS.GUILD_MESSAGES,
@@ -14,6 +15,7 @@ client.on("ready", () => {
 })
 
 client.on("messageCreate", msg => {
+  if (msg.author.bot) return
   console.log("Message coming")
 
   const messageObject = {
@@ -28,7 +30,22 @@ client.on("messageCreate", msg => {
   }
   if (messageObject.score.includes(1)){
     messageObject.toxicity = true
-    msg.reply("you're having bad behavior")
+      const row = new MessageActionRow()
+			.addComponents(
+				new MessageButton()
+					.setCustomId('send')
+					.setLabel('send')
+					.setStyle('PRIMARY'),
+			);
+
+      const embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('you are doing great')
+      
+
+			msg.reply({ content: 'please use these suggestions', ephemeral: true, embeds: [embed], components: [row] });
+    
+
   }
 
   messageCollection = messageCollection
