@@ -1,20 +1,35 @@
-const { Client, Intents } = require('discord.js')
-const { MessageActionRow, MessageSelectMenu, MessageButton, MessageEmbed } = require('discord.js')
-const client = new Client({ intents: [
+const fs = require('fs');
+const { Client, Intents, WebhookClient, Collection } = require('discord.js');
+
+// Initialize discord client
+const discordClient = new Client({ intents: [
   Intents.FLAGS.GUILDS, 
   Intents.FLAGS.GUILD_MESSAGES,
   Intents.FLAGS.DIRECT_MESSAGES
-]})
+]});
+// Initialize commands used by discord server
+discordClient.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	discordClient.commands.set(command.data.name, command);
+}
+
+// Initialize the web hook to send message as a user
+const captainHook = new WebhookClient({
+  id: process.env['CAPTAIN_HOOK_ID'],
+  token: process.env['CAPTAIN_HOOK_TOKEN']
+})
 
 let messageCollection = []
 let badWord = ['fuck', 'gay']
 let badFilter=[]
 
-client.on("ready", () => {
-  console.log(`logged in as ${client.user.tag}!`)
+discordClient.on("ready", () => {
+  console.log(`logged in as ${discordClient.user.tag}!`)
 })
 
-client.on("messageCreate", msg => {
+discordClient.on("messageCreate", msg => {
   if (msg.author.bot) return
   console.log("Message coming")
 
@@ -35,8 +50,10 @@ client.on("messageCreate", msg => {
 				new MessageButton()
 					.setCustomId('send')
 					.setLabel('send')
-					.setStyle('PRIMARY'),
-			);
+					.setStyle('PRIMARY')
+          
+			)
+
 
       const embed = new MessageEmbed()
 			.setColor('#0099ff')
@@ -63,4 +80,25 @@ client.on("messageCreate", msg => {
   })
 })
 
-client.login(process.env['TOKEN'])
+discordClient.on('interactionCreate', async interaction => {
+  if (interaction.isCommand()) {
+    const command = discordClient.commands.get(interaction.commandName);
+
+    if (!command) return;
+  
+    try {
+      await command.execute(captainHook, interaction);
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+    }
+  }
+
+	if (interaction.isButton()) {
+    if (interaction.customId === 'send') {
+      await interaction.reply(interaction.title)
+    }
+  }
+});
+
+discordClient.login(process.env['TOKEN']);
