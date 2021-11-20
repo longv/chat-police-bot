@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('all')
-		.setDescription('Chat to all players')
+		.setName('team')
+		.setDescription('Chat to your team')
     .addStringOption(option =>
 		  option.setName('input')
       .setDescription('Put your chat here')
