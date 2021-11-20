@@ -94,7 +94,9 @@ discordClient.on("messageCreate", msg => {
             })
           
 			)
-      msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
+      msg.react("🚨");
+      msg.author.send({content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", components: [row]})
+      //msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
     
 
   }
