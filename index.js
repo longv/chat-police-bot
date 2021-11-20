@@ -5,15 +5,25 @@ const client = new Client({ intents: [
   Intents.FLAGS.DIRECT_MESSAGES
 ]})
 
+
+const MessageCollection =[]
+
+
 client.on("ready", () => {
   console.log(`logged in as ${client.user.tag}!`)
 })
 
 client.on("messageCreate", msg => {
   console.log("Message coming")
-  if(msg.content === "ping"){
-    msg.reply("pong")
-  }
+
+  const messageObject = {
+    body: msg.content,
+    id: MessageCollection.length +1,
+    score: [Math.floor(Math.random()*1),Math.floor(Math.random()*1),
+      Math.floor(Math.random()*1),Math.floor(Math.random()*1),
+      Math.floor(Math.random()*1),Math.floor(Math.random()*1)]
+    }
+  console.log(messageObject.body, messageObject.score)
 })
 
 
