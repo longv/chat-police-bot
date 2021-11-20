@@ -1,0 +1,18 @@
+version: "1.0"
+stories:
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: disruptive rasist
+  steps:
+  - intent: disruptive_racist
+  - action: utter_racial
+
+- story: disruptive sexist
+  steps:
+  - intent: disruptive_sexist
+  - action: utter_sexist
