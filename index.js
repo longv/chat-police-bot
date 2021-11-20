@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { Client, Intents, WebhookClient, Collection,MessageActionRow,MessageButton,MessageEmbed, MessageCollector } = require('discord.js');
+import * as tf from '@tensorflow/tfjs-node'
 
 // Initialize discord client
 const discordClient = new Client({ intents: [
@@ -20,6 +21,10 @@ const captainHook = new WebhookClient({
   id: process.env['CAPTAIN_HOOK_ID'],
   token: process.env['CAPTAIN_HOOK_TOKEN']
 })
+
+// Tensorflow
+const model = tf.loadLayersModel('src/toxic_gauge/model/toxic_gauge/model/model.json')
+console.log(model.summary())
 
 let messageCollection = []
 let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
