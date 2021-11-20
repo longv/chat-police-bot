@@ -25,6 +25,7 @@ let messageCollection = []
 let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
 let badFilter=[]
 let warNingdisplay=['SECONDARY','SUCCESS','DANGER']
+let i=0
 
 discordClient.on("ready", () => {
   console.log(`logged in as ${discordClient.user.tag}!`)
@@ -45,6 +46,7 @@ discordClient.on("messageCreate", msg => {
     toxicity: false     
   }
   if (messageObject.score.includes(1)){
+    i+=1
     messageObject.toxicity = true
       const row = new MessageActionRow()
 			.addComponents(
@@ -72,7 +74,24 @@ discordClient.on("messageCreate", msg => {
 				new MessageButton()
 					.setCustomId('originContent')
           .setLabel(messageObject.body)
-          .setStyle(warNingdisplay[badFilter.length-1])
+          
+          .setStyle(()=>{
+            if (i == 1){
+              return (
+                'SECONDARY'
+              )
+            }
+            if (i == 2){
+              return (
+                'SUCCESS'
+              )
+            }
+            if (i >= 3){
+              return (
+                'DANGER'
+              )
+            }
+            })
           
 			)
       msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
