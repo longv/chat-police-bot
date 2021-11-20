@@ -17,8 +17,13 @@ https://en.wikipedia.org/wiki/Category:Pejorative_terms_for_women
 https://en.wikipedia.org/wiki/List_of_ethnic_slurs_by_ethnicity
 
 ```
+# Install python libraries based on setup.py
+
 # Download language package of en
 python3 -m spacy download en_core_web_mdCollecting en_core_web_md==2.3.1
-
+# Train model - model will be stored in a /models directory 
+rasa train
+# Run chat bot on channel - custom connector https://rasa.com/docs/rasa/connectors/custom-connectors
+rasa run -m models
 ```
 
