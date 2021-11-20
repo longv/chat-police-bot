@@ -2,11 +2,15 @@ const fs = require('fs');
 const { Client, Intents, WebhookClient, Collection,MessageActionRow,MessageButton,MessageEmbed, MessageCollector } = require('discord.js');
 
 // Initialize discord client
-const discordClient = new Client({ intents: [
-  Intents.FLAGS.GUILDS, 
-  Intents.FLAGS.GUILD_MESSAGES,
-  Intents.FLAGS.DIRECT_MESSAGES
-]});
+const discordClient = new Client({ 
+  intents: [
+    Intents.FLAGS.GUILDS, 
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+  ],
+  partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+});
 // Initialize commands used by discord server
 discordClient.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -74,6 +78,30 @@ discordClient.on("messageCreate", msg => {
     console.log(message.body, message.id, message.score, message.toxicity)
     
   })
+})
+
+discordClient.on('messageReactionAdd', async reaction => {
+  if (reaction.partial) {
+		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			// Return as `reaction.message.author` may be undefined/null
+			return;
+		}
+	}
+
+  const isMarked = reaction.users.cache.some(user => user.id === discordClient.user.id);
+  if (isMarked) {
+    const guildManager = await discordClient.guilds.fetch(process.env['GUILD_ID'])
+    const totalUserCount = guildManager.memberCount - 3
+    const reactedUserCount = reaction.count - 1;
+    const reactedRatio = reactedUserCount / totalUserCount;
+    if (reactedRatio >= 0.5) {
+      reaction.message.delete();
+    }
+  }
 })
 
 discordClient.on('interactionCreate', async interaction => {
