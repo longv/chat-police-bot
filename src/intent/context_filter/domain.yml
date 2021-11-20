@@ -28,11 +28,16 @@ responses:
   utter_happy:
   - text: "Great, carry on!"
 
-  utter_goodbye:
-  - text: "Bye"
-
   utter_iamabot:
   - text: "I am a bot, powered by Rasa."
+
+  utter_racial:
+  - text: "Hey, that's considered racist. You can be better than that"
+  - text: "Placeholder for 2nd racial response"
+
+  utter_sexist:
+  - text: "I think you can treat women better"
+  - text: "Did you say that you your mother as well?"
 
 session_config:
   session_expiration_time: 60  # value in minutes

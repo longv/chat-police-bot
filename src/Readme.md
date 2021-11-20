@@ -16,5 +16,9 @@ https://www.researchgate.net/figure/TOP15-toxic-words-in-the-LOL-chats-Numbers-i
 https://en.wikipedia.org/wiki/Category:Pejorative_terms_for_women
 https://en.wikipedia.org/wiki/List_of_ethnic_slurs_by_ethnicity
 
+```
+# Download language package of en
+python3 -m spacy download en_core_web_mdCollecting en_core_web_md==2.3.1
 
+```
 

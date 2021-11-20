@@ -98,7 +98,7 @@ nlu:
     - ching chong
     - dink
     - jap
-- intent: disruptive_racial
+- intent: disruptive_sexist
   examples: |
     - feminazi
     - bitchy

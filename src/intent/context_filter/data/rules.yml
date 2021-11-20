@@ -11,7 +11,7 @@ rules:
   - rule: thankyou
     steps:
       - intent: thankyou
-      - action: utter_youarewelcome
+      - action: utter_cheer_up
   - rule: goodbye
     steps:
       - intent: goodbye

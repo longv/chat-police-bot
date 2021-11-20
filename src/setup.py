@@ -1,6 +1,6 @@
 from setuptools import setup
 
-PACKAGES = ['numpy', 'pandas', 'tensorflow', 'rasa']
+PACKAGES = ['black', 'numpy', 'pandas', 'tensorflow==2.4.1', 'rasa', 'rasa_sdk']
 
 setup(
     name='junction2021',
