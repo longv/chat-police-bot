@@ -16,15 +16,32 @@ client.on("ready", () => {
 client.on("messageCreate", msg => {
   console.log("Message coming")
 
-  const messageObject = {
+const messageObject = {
     body: msg.content,
     id: MessageCollection.length +1,
     score: [Math.floor(Math.random()*1),Math.floor(Math.random()*1),
       Math.floor(Math.random()*1),Math.floor(Math.random()*1),
-      Math.floor(Math.random()*1),Math.floor(Math.random()*1)]
+      Math.floor(Math.random()*1),Math.floor(Math.random()*1)],
+    toxicity: false
+      
     }
-  console.log(messageObject.body, messageObject.score)
+    
+    MessageCollection.concat(messageObject)
+    setMessagetoxicity(MessageCollection)
+  MessageCollection.map(message => {
+    console.log(message.body, message.id, message.score, message.toxicity)
+  })
 })
+
+const setMessagetoxicity = (mesSage) => {
+  mesSage.map(message => {
+    if (message.score.includes(1))
+    message.toxicity = true;
+  })
+}
+
+
+
 
 
 
