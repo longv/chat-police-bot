@@ -24,6 +24,7 @@ const captainHook = new WebhookClient({
 let messageCollection = []
 let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
 let badFilter=[]
+let warNingdisplay=['SECONDARY','SUCCESS','DANGER']
 
 discordClient.on("ready", () => {
   console.log(`logged in as ${discordClient.user.tag}!`)
@@ -71,7 +72,7 @@ discordClient.on("messageCreate", msg => {
 				new MessageButton()
 					.setCustomId('originContent')
           .setLabel(messageObject.body)
-          .setStyle('DANGER')
+          .setStyle(warNingdisplay[badFilter.length-1])
           
 			)
       msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
