@@ -129,7 +129,8 @@ dmypy.json
 .pyre/
 
 # Data
-data/
+src/data/dataset/*/*.csv
+src/data/dataset/*/*.txt
 
 # MacOS
 .DS_Store
