@@ -2,11 +2,15 @@ const fs = require('fs');
 const { Client, Intents, WebhookClient, Collection,MessageActionRow,MessageButton,MessageEmbed, MessageCollector } = require('discord.js');
 
 // Initialize discord client
-const discordClient = new Client({ intents: [
-  Intents.FLAGS.GUILDS, 
-  Intents.FLAGS.GUILD_MESSAGES,
-  Intents.FLAGS.DIRECT_MESSAGES
-]});
+const discordClient = new Client({ 
+  intents: [
+    Intents.FLAGS.GUILDS, 
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+  ],
+  partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+});
 // Initialize commands used by discord server
 discordClient.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -24,7 +28,7 @@ const captainHook = new WebhookClient({
 let messageCollection = []
 let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
 let badFilter=[]
-let warNingdisplay=['SECONDARY','SUCCESS','DANGER']
+let warNingdisplay=['SECONDARY','SUCCESS','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER',]
 let i=0
 
 discordClient.on("ready", () => {
@@ -48,55 +52,19 @@ discordClient.on("messageCreate", msg => {
   if (messageObject.score.includes(1)){
     i+=1
     messageObject.toxicity = true
-      const row = new MessageActionRow()
-			.addComponents(
-				new MessageButton()
-					.setCustomId('instruction1')
-          .setLabel(instrucTion[0])
-          .setStyle('PRIMARY')
-          
-			)
+    const row = new MessageActionRow()
       .addComponents(
-				new MessageButton()
-					.setCustomId('instruction2')
-          .setLabel(instrucTion[1])
-          .setStyle('PRIMARY')
-          
-			)
-      .addComponents(
-				new MessageButton()
-					.setCustomId('instruction3')
-          .setLabel(instrucTion[2])
-          .setStyle('PRIMARY')
-          
-			)
-      .addComponents(
-				new MessageButton()
-					.setCustomId('originContent')
-          .setLabel(messageObject.body)
-          
-          .setStyle(()=>{
-            if (i == 1){
-              return (
-                'SECONDARY'
-              )
-            }
-            if (i == 2){
-              return (
-                'SUCCESS'
-              )
-            }
-            if (i >= 3){
-              return (
-                'DANGER'
-              )
-            }
-            })
-          
-			)
-      msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
-    
-
+        new MessageButton()
+        .setURL(msg.url)
+        .setLabel('Go to message')
+        .setStyle('LINK')
+      )
+    msg.react("🚨");
+    msg.author.send({
+      content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", 
+      components: [row]
+    })
+    //msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
   }
 
   messageCollection = messageCollection
@@ -110,6 +78,30 @@ discordClient.on("messageCreate", msg => {
     console.log(message.body, message.id, message.score, message.toxicity)
     
   })
+})
+
+discordClient.on('messageReactionAdd', async reaction => {
+  if (reaction.partial) {
+		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			// Return as `reaction.message.author` may be undefined/null
+			return;
+		}
+	}
+
+  const isMarked = reaction.users.cache.some(user => user.id === discordClient.user.id);
+  if (isMarked) {
+    const guildManager = await discordClient.guilds.fetch(process.env['GUILD_ID'])
+    const totalUserCount = guildManager.memberCount - 3
+    const reactedUserCount = reaction.count - 1;
+    const reactedRatio = reactedUserCount / totalUserCount;
+    if (reactedRatio >= 0.5) {
+      reaction.message.delete();
+    }
+  }
 })
 
 discordClient.on('interactionCreate', async interaction => {
