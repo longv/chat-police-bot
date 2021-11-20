@@ -1,9 +1,11 @@
-language: "en"
+  language: "en"
 
-pipeline:
-- name: "nlp_spacy"                   # loads the spacy language model
-- name: "tokenizer_spacy"             # splits the sentence into tokens
-- name: "ner_crf"                     # uses the pretrained spacy NER model
-- name: "intent_featurizer_spacy"     # transform the sentence into a vector representation
-- name: "intent_classifier_sklearn"   # uses the vector representation to classify using SVM
-- name: "ner_synonyms"                # trains the synonyms
+  pipeline:
+  - name: "nlp_mitie"
+    model: "MITIE-models/english/total_word_feature_extractor.dat"
+  - name: "tokenizer_mitie"
+  - name: "ner_mitie"
+  - name: "ner_synonyms"
+  - name: "intent_entity_featurizer_regex"
+  - name: "intent_featurizer_mitie"
+  - name: "intent_classifier_sklearn"

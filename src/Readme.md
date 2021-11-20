@@ -9,8 +9,12 @@ https://drive.google.com/file/d/19jy3iuoWvuxDXbHTBgmsa2lzMeeQSRis/view?pli=1
 ### Model 2 - Context classification
 Get context of given sentence and based on that setup response 
 
-Based on https://www.researchgate.net/figure/TOP15-toxic-words-in-the-LOL-chats-Numbers-include-both-EUNE-and-EUW-servers_tbl1_332776925
 
-I prepared en_performance_words.txt
+Dictionary of words and intents based on below:
+Based on
+https://www.researchgate.net/figure/TOP15-toxic-words-in-the-LOL-chats-Numbers-include-both-EUNE-and-EUW-servers_tbl1_332776925
+https://en.wikipedia.org/wiki/Category:Pejorative_terms_for_women
+https://en.wikipedia.org/wiki/List_of_ethnic_slurs_by_ethnicity
+
 
 
