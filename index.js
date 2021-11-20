@@ -48,41 +48,19 @@ discordClient.on("messageCreate", msg => {
   if (messageObject.score.includes(1)){
     i+=1
     messageObject.toxicity = true
-      const row = new MessageActionRow()
-			.addComponents(
-				new MessageButton()
-					.setCustomId('instruction1')
-          .setLabel(instrucTion[0])
-          .setStyle('PRIMARY')
-          
-			)
+    const row = new MessageActionRow()
       .addComponents(
-				new MessageButton()
-					.setCustomId('instruction2')
-          .setLabel(instrucTion[1])
-          .setStyle('PRIMARY')
-          
-			)
-      .addComponents(
-				new MessageButton()
-					.setCustomId('instruction3')
-          .setLabel(instrucTion[2])
-          .setStyle('PRIMARY')
-          
-			)
-      .addComponents(
-				new MessageButton()
-					.setCustomId('originContent')
-          .setLabel(messageObject.body)
-          
-          .setStyle(warNingdisplay[badFilter.length])
-          
-			)
-      msg.react("🚨");
-      msg.author.send({content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", components: [row]})
-      //msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
-    
-
+        new MessageButton()
+        .setURL(msg.url)
+        .setLabel('Go to message')
+        .setStyle('LINK')
+      )
+    msg.react("🚨");
+    msg.author.send({
+      content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", 
+      components: [row]
+    })
+    //msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
   }
 
   messageCollection = messageCollection
