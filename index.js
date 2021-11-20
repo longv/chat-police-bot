@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { Client, Intents, WebhookClient, Collection } = require('discord.js');
+const { Client, Intents, WebhookClient, Collection,MessageActionRow,MessageButton,MessageEmbed, MessageCollector } = require('discord.js');
 
 // Initialize discord client
 const discordClient = new Client({ intents: [
@@ -22,7 +22,7 @@ const captainHook = new WebhookClient({
 })
 
 let messageCollection = []
-let badWord = ['fuck', 'gay']
+let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
 let badFilter=[]
 
 discordClient.on("ready", () => {
@@ -48,19 +48,33 @@ discordClient.on("messageCreate", msg => {
       const row = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
-					.setCustomId('send')
-					.setLabel('send')
-					.setStyle('PRIMARY')
+					.setCustomId('instruction1')
+          .setLabel(instrucTion[0])
+          .setStyle('PRIMARY')
           
 			)
-
-
-      const embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle('you are doing great')
-      
-
-			msg.reply({ content: 'please use these suggestions', ephemeral: true, embeds: [embed], components: [row] });
+      .addComponents(
+				new MessageButton()
+					.setCustomId('instruction2')
+          .setLabel(instrucTion[1])
+          .setStyle('PRIMARY')
+          
+			)
+      .addComponents(
+				new MessageButton()
+					.setCustomId('instruction3')
+          .setLabel(instrucTion[2])
+          .setStyle('PRIMARY')
+          
+			)
+      .addComponents(
+				new MessageButton()
+					.setCustomId('originContent')
+          .setLabel(messageObject.body)
+          .setStyle('DANGER')
+          
+			)
+      msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
     
 
   }
@@ -71,8 +85,6 @@ discordClient.on("messageCreate", msg => {
   badFilter = messageCollection.filter(message => message.toxicity == true)
   console.log(JSON.stringify(badFilter))
   console.log(badFilter.length)
-
-
 
   messageCollection.forEach(message => {
     console.log(message.body, message.id, message.score, message.toxicity)
@@ -95,8 +107,17 @@ discordClient.on('interactionCreate', async interaction => {
   }
 
 	if (interaction.isButton()) {
-    if (interaction.customId === 'send') {
-      await interaction.reply(interaction.title)
+    if (interaction.customId === 'instruction1') {
+      await interaction.reply({content:instrucTion[0]})
+    }
+    if (interaction.customId === 'instruction2') {
+      await interaction.reply({content: instrucTion[1]})
+    }
+    if (interaction.customId === 'instruction3') {
+      await interaction.reply({content: instrucTion[2]})
+    }
+    if (interaction.customId === 'originContent') {
+      await interaction.reply({content: messageCollection[messageCollection.length-1].body })
     }
   }
 });
