@@ -24,7 +24,7 @@ const captainHook = new WebhookClient({
 let messageCollection = []
 let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
 let badFilter=[]
-let warNingdisplay=['SECONDARY','SUCCESS','DANGER']
+let warNingdisplay=['SECONDARY','SUCCESS','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER',]
 let i=0
 
 discordClient.on("ready", () => {
@@ -75,23 +75,7 @@ discordClient.on("messageCreate", msg => {
 					.setCustomId('originContent')
           .setLabel(messageObject.body)
           
-          .setStyle(()=>{
-            if (i == 1){
-              return (
-                'SECONDARY'
-              )
-            }
-            if (i == 2){
-              return (
-                'SUCCESS'
-              )
-            }
-            if (i >= 3){
-              return (
-                'DANGER'
-              )
-            }
-            })
+          .setStyle(warNingdisplay[badFilter.length])
           
 			)
       msg.react("🚨");
