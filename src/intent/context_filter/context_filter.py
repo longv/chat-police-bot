@@ -30,13 +30,13 @@ class ContextFilter:
         """
         Check if text words are present in filename list
         """
-        is_from_wordsfile = None
         with open(filename) as f:
             single_words = [line.rstrip() for line in f]
             is_from_wordsfile = any(word in text_words for word in single_words)
         return is_from_wordsfile
 
-    def get_intent_response(self, reason):
+    @staticmethod
+    def get_intent_response(reason):
         response = ""
         if reason == "stop_talking":
             with open(path_stoptalk_fixphrases) as f:
