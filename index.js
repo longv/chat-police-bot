@@ -1,5 +1,13 @@
 const fs = require('fs');
-const { Client, Intents, WebhookClient, Collection,MessageActionRow,MessageButton,MessageEmbed, MessageCollector } = require('discord.js');
+const { 
+  Client, 
+  Intents, 
+  WebhookClient, 
+  Collection,
+  MessageActionRow,
+  MessageButton,
+} = require('discord.js');
+const Database = require("@replit/database")
 
 // Initialize discord client
 const discordClient = new Client({ 
@@ -25,33 +33,19 @@ const captainHook = new WebhookClient({
   token: process.env['CAPTAIN_HOOK_TOKEN']
 })
 
-let messageCollection = []
-let instrucTion = ["you're doing great", "it's okay", "let's enjoy the game"]
-let badFilter=[]
-let warNingdisplay=['SECONDARY','SUCCESS','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER','DANGER',]
-let i=0
+//Initialize database
+const db = new Database();
 
-discordClient.on("ready", () => {
+discordClient.on("ready", async () => {
   console.log(`logged in as ${discordClient.user.tag}!`)
 })
 
-discordClient.on("messageCreate", msg => {
+discordClient.on("messageCreate", async msg => {
   if (msg.author.bot) return
+
   console.log("Message coming")
 
-  const messageObject = {
-    body: msg.content,
-    id: messageCollection.length +1,
-    score: [
-      Math.floor(Math.random()*2),Math.floor(Math.random()*2),
-      Math.floor(Math.random()*2),Math.floor(Math.random()*2),
-      Math.floor(Math.random()*2),Math.floor(Math.random()*2)
-    ],
-    toxicity: false     
-  }
-  if (messageObject.score.includes(1)){
-    i+=1
-    messageObject.toxicity = true
+  if (false){
     const row = new MessageActionRow()
       .addComponents(
         new MessageButton()
@@ -59,35 +53,74 @@ discordClient.on("messageCreate", msg => {
         .setLabel('Go to message')
         .setStyle('LINK')
       )
+
+    let warning = await db.get("warning")
+    if (!warning) {
+      warning = {}
+    }
+    const markedMessageIds = warning[msg.author.id] ?? []
+    if (markedMessageIds.length < 3) {
+      markedMessageIds.push(msg.id)
+      warning[msg.author.id] = markedMessageIds
+      await db.set("warning", warning)
+    }
+    console.log(warning)
+
     msg.react("🚨");
-    msg.author.send({
-      content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", 
-      components: [row]
-    })
-    //msg.reply({ content: "you're having bad behaviour, please use these suggestion below. You can proceed to continue but your BAD BEHAVIOUR- COUNT will increase by 1", ephemeral: true, components: [row] });
+    if (markedMessageIds.length < 3) {
+      msg.author.send({
+        content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", 
+        components: [row]
+      })
+    } else {
+      const guildManager = await discordClient.guilds.fetch(process.env['GUILD_ID'])
+      const roles = await guildManager.roles.fetch()
+      const mutedRole = roles.find(role => role.id == [process.env['MUTED_ROLE_ID']])
+      msg.member.roles.add(mutedRole)
+      msg.author.send({
+        content: "You has been muted"
+      })
+    }
   }
+})
 
-  messageCollection = messageCollection
-    .concat(messageObject)
-    
-  badFilter = messageCollection.filter(message => message.toxicity == true)
-  console.log(JSON.stringify(badFilter))
-  console.log(badFilter.length)
+discordClient.on("messageUpdate", async (oldMsg, newMsg) => {
+  console.log("Message update")
+  console.log(newMsg.author.id)
+  const warning = await db.get("warning")
+  if (warning) {
+    let markedMessageIds = warning[newMsg.author.id] ?? []
+    markedMessageIds = markedMessageIds.filter(id => id !== newMsg.id)
+    warning[newMsg.author.id] = markedMessageIds
+    await db.set("warning", warning)
+    console.log(warning)
+  }
+})
 
-  messageCollection.forEach(message => {
-    console.log(message.body, message.id, message.score, message.toxicity)
-    
-  })
+discordClient.on("messageDelete", async msg => {
+  console.log("Message delete")
+  console.log(msg.id)
+  const warning = await db.get("warning")
+  if (warning) {
+    Object.keys(warning).forEach(async authorId => {
+      let markedMessageIds = warning[authorId] ?? []
+      if (markedMessageIds.includes(msg.id)) {
+        markedMessageIds = markedMessageIds.filter(id => id !== msg.id)
+        warning[authorId] = markedMessageIds
+        await db.set("warning", warning)
+        console.log(warning)
+        return
+      }
+    })
+  }
 })
 
 discordClient.on('messageReactionAdd', async reaction => {
   if (reaction.partial) {
-		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
 		try {
 			await reaction.fetch();
 		} catch (error) {
 			console.error('Something went wrong when fetching the message:', error);
-			// Return as `reaction.message.author` may be undefined/null
 			return;
 		}
 	}
@@ -115,21 +148,6 @@ discordClient.on('interactionCreate', async interaction => {
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-    }
-  }
-
-	if (interaction.isButton()) {
-    if (interaction.customId === 'instruction1') {
-      await interaction.reply({content:instrucTion[0]})
-    }
-    if (interaction.customId === 'instruction2') {
-      await interaction.reply({content: instrucTion[1]})
-    }
-    if (interaction.customId === 'instruction3') {
-      await interaction.reply({content: instrucTion[2]})
-    }
-    if (interaction.customId === 'originContent') {
-      await interaction.reply({content: messageCollection[messageCollection.length-1].body })
     }
   }
 });
