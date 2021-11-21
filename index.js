@@ -43,6 +43,7 @@ const hateLabels = ["toxic", "severe_toxic", "obscene", "threat", "insult", "ide
 
 discordClient.on("ready", async () => {
   console.log(`logged in as ${discordClient.user.tag}!`)
+  //await db.delete("warning")
 })
 
 discordClient.on("messageCreate", async msg => {
@@ -100,14 +101,25 @@ discordClient.on("messageCreate", async msg => {
 
 discordClient.on("messageUpdate", async (oldMsg, newMsg) => {
   console.log("Message update")
-  console.log(newMsg.author.id)
+
+  const response = await axios.get(`http://192.168.86.154:8000/predict?sentence=${newMsg.content}`)
+  const scores = response.data
+  console.log(scores)
+
+  const violations = hateLabels.filter(label => scores[label] > 0.5)
+    .map(label => label.replace('_', ' '));
+  console.log(violations)
+
   const warning = await db.get("warning")
   if (warning) {
     let markedMessageIds = warning[newMsg.author.id] ?? []
-    markedMessageIds = markedMessageIds.filter(id => id !== newMsg.id)
-    warning[newMsg.author.id] = markedMessageIds
-    await db.set("warning", warning)
-    console.log(warning)
+    if (violations.length === 0 && markedMessageIds.includes(newMsg.id)) {
+      markedMessageIds = markedMessageIds.filter(id => id !== newMsg.id)
+      warning[newMsg.author.id] = markedMessageIds
+      await db.set("warning", warning)
+      await newMsg.reactions.cache.get("🚨").remove()
+      console.log(warning)
+    }
   }
 })
 
