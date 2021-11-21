@@ -1,4 +1,6 @@
+require('dotenv').config()
 const fs = require('fs');
+const axios = require('axios');
 const { 
   Client, 
   Intents, 
@@ -33,8 +35,11 @@ const captainHook = new WebhookClient({
   token: process.env['CAPTAIN_HOOK_TOKEN']
 })
 
-//Initialize database
-const db = new Database();
+// Initialize database
+const db = new Database(process.env["REPLIT_DATABASE_URL"]);
+
+// Initialize hate labels
+const hateLabels = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
 
 discordClient.on("ready", async () => {
   console.log(`logged in as ${discordClient.user.tag}!`)
@@ -45,7 +50,14 @@ discordClient.on("messageCreate", async msg => {
 
   console.log("Message coming")
 
-  if (false){
+  const response = await axios.get(`http://192.168.86.154:8000/predict?sentence=${msg.content}`)
+  const scores = response.data
+  console.log(scores)
+
+  const violations = hateLabels.filter(label => scores[label] > 0.5);
+  console.log(violations)
+
+  if (violations.length > 0){
     const row = new MessageActionRow()
       .addComponents(
         new MessageButton()
@@ -69,7 +81,7 @@ discordClient.on("messageCreate", async msg => {
     msg.react("🚨");
     if (markedMessageIds.length < 3) {
       msg.author.send({
-        content: "One of your messages seems to have an appropriate word. Let's fix it shall we?", 
+        content: `One of your messages seems to contain hate speech _**${violations.join(', ')}**_.\nLet's fix it shall we?`, 
         components: [row]
       })
     } else {
@@ -78,7 +90,7 @@ discordClient.on("messageCreate", async msg => {
       const mutedRole = roles.find(role => role.id == [process.env['MUTED_ROLE_ID']])
       msg.member.roles.add(mutedRole)
       msg.author.send({
-        content: "You has been muted"
+        content: `You has been muted due to sending hate speech multiple times.\nLast message seems to contain _**${violations.join(', ')}**_`
       })
     }
   }
